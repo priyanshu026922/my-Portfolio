@@ -22,32 +22,59 @@ const Header = () => {
     setSubmitted(false);
     setShowModal(true);
   };
-
+  
   const handleSubmitEmail = async () => {
-    if (!isValidEmail(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
+  if (!isValidEmail(email)) {
+    setError('Please enter a valid email address');
+    return;
+  }
 
-    setIsSubmitting(true);
-    setError('');
+  setIsSubmitting(true);
+  setError('');
 
-    try {
-      await fetch(GOOGLE_SHEET_ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors', // Apps Script doesn't return CORS headers by default
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ email }),
-      });
-    } catch (err) {
-      console.error('Failed to log email:', err);
-      // Still show success to the user — we don't want to expose backend issues,
-      // and the request may have gone through despite the no-cors read error
-    } finally {
-      setIsSubmitting(false);
-      setSubmitted(true);
-    }
-  };
+  try {
+    const formData = new URLSearchParams();
+    formData.append('email', email);
+
+    await fetch(GOOGLE_SHEET_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors', // Apps Script doesn't return CORS headers by default
+      body: formData,
+    });
+  } catch (err) {
+    console.error('Failed to log email:', err);
+    // Still show success to the user — we don't want to expose backend issues,
+    // and the request may have gone through despite the no-cors read error
+  } finally {
+    setIsSubmitting(false);
+    setSubmitted(true);
+  }
+};
+  // const handleSubmitEmail = async () => {
+  //   if (!isValidEmail(email)) {
+  //     setError('Please enter a valid email address');
+  //     return;
+  //   }
+
+  //   setIsSubmitting(true);
+  //   setError('');
+
+  //   try {
+  //     await fetch(GOOGLE_SHEET_ENDPOINT, {
+  //       method: 'POST',
+  //       mode: 'no-cors', // Apps Script doesn't return CORS headers by default
+  //       headers: { 'Content-Type': 'text/plain' },
+  //       body: JSON.stringify({ email }),
+  //     });
+  //   } catch (err) {
+  //     console.error('Failed to log email:', err);
+  //     // Still show success to the user — we don't want to expose backend issues,
+  //     // and the request may have gone through despite the no-cors read error
+  //   } finally {
+  //     setIsSubmitting(false);
+  //     setSubmitted(true);
+  //   }
+  // };
 
   const closeModal = () => {
     setShowModal(false);
